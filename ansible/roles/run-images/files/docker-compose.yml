@@ -1,0 +1,22 @@
+services:
+  app:
+    image: registry:5000/app:latest
+    expose:
+      - '80'
+    networks:
+      - net
+    restart: unless-stopped
+
+  nginx:
+    image: registry:5000/nginx:latest
+    ports:
+      - '8080:80'
+    depends_on:
+      - app
+    networks:
+      - net
+    restart: unless-stopped
+
+networks:
+  net:
+    driver: bridge

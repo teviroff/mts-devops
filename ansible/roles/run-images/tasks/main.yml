@@ -1,0 +1,32 @@
+---
+- name: resolve-registry-address
+  set_fact:
+    registry: '{{ "127.0.0.1" if registry == ansible_host else registry }}'
+
+- name: update-hosts-file
+  lineinfile:
+    path: /etc/hosts
+    line: '{{ registry }} registry'
+    regexp: 'registry'
+    state: present
+
+- name: create-working-dir
+  file:
+    path: '{{ workdir }}'
+    state: directory
+    owner: deploy
+    group: deploy
+    mode: '0755'
+
+- name: copy-compose-file
+  copy:
+    src: '{{ compose_file }}'
+    dest: '{{ workdir }}/docker-compose.yml'
+    owner: deploy
+    group: deploy
+    mode: '0644'
+
+- name: run-docker-compose
+  community.docker.docker_compose_v2:
+    project_src: '{{ workdir }}'
+    state: present

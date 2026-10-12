@@ -1,0 +1,22 @@
+---
+- name: setup-registry
+  hosts: registries
+  become: yes
+  roles:
+    - common
+    - init-docker
+    - init-docker-registry
+    - role: build-docker-image
+      image: app
+    - role: build-docker-image
+      image: nginx
+
+- name: setup-server
+  hosts: servers
+  become: yes
+  roles:
+    - common
+    - init-docker
+    - role: run-images
+      compose_file: docker-compose.yml
+      workdir: /opt/project

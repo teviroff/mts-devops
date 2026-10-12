@@ -1,0 +1,17 @@
+---
+- name: create-deploy-user
+  user:
+    name: deploy
+    state: present
+    shell: /bin/bash
+    append: yes
+    groups: sudo
+    password: '!'
+
+- name: create-ssh-dir
+  file:
+    path: /home/deploy/.ssh
+    state: directory
+    mode: '0700'
+    owner: deploy
+    group: deploy
