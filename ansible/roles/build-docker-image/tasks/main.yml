@@ -1,0 +1,32 @@
+---
+- name: create-image-dir[{{ image }}]
+  file:
+    path: '/opt/{{ image }}'
+    state: directory
+    owner: deploy
+    group: deploy
+    mode: '0755'
+
+- name: copy-image-files[{{ image }}]
+  copy:
+    src: '{{ image }}/'
+    dest: '/opt/{{ image }}/'
+    owner: deploy
+    group: deploy
+    mode: '0644'
+
+- name: build-image[{{ image }}]
+  community.docker.docker_image:
+    name: 'localhost:5000/{{ image }}'
+    tag: latest
+    source: build
+    build:
+      path: '/opt/{{ image }}'
+    force_source: yes
+
+- name: push-image-to-registry[{{ image }}]
+  community.docker.docker_image:
+    name: "localhost:5000/{{ image }}"
+    tag: latest
+    push: yes
+    source: local

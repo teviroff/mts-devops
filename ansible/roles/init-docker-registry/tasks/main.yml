@@ -1,0 +1,26 @@
+---
+- name: create-registry-dir
+  file:
+    path: /opt/registry
+    state: directory
+    owner: deploy
+    group: deploy
+    mode: '0755'
+
+- name: copy-registry-compose-file
+  copy:
+    src: docker-compose.yml
+    dest: /opt/registry/docker-compose.yml
+    owner: deploy
+    group: deploy
+    mode: '0644'
+
+- name: start-registry-container
+  community.docker.docker_compose_v2:
+    project_src: /opt/registry
+    state: present
+
+- name: await-registry-ready
+  wait_for:
+    port: 5000
+    timeout: 30
